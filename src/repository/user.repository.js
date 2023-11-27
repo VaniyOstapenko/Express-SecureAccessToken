@@ -2,13 +2,21 @@ const pool = require('../db');
 
 async function createUserDB(name, surname, email, hashPwd) {
     const client = await pool.connect();
-
-    const sql = `insert into users(name, surname, email, pwd) 
+    try {
+        await client.query('BEGIN');
+        const sql = `insert into users(name, surname, email, pwd) 
     values ($1, $2, $3, $4) returning *`;
 
-    const data = (await client.query(sql, [name, surname, email, hashPwd])).rows;
+        const data = (await client.query(sql, [name, surname, email, hashPwd])).rows;
+        await client.query('COMMIT');
 
-    return data;
+        return data;
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.log(`createUser: ${error.message}`);
+
+        return [];
+    }
 }
 
 async function getUserByEmail(email) {
