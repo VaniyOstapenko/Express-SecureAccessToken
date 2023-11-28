@@ -16,7 +16,7 @@ async function createUser(name, surname, email, pwd) {
 
 async function authUser(email, pwd) {
     const user = await getUserByEmail(email);
-    if (!user.length) throw new Error('email is not found');
+    if (!user.length) throw new Error('user is not found');
 
     const pwdUserHash = user[0].pwd;
 
